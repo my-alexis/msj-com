@@ -67,6 +67,23 @@
             margin-bottom: 25px;
         }
 
+        /* --- NUEVO: Contenedor en fila para campos paralelos --- */
+        .form-row {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        /* Columna de números: más estrecha */
+        .col-numeros {
+            flex: 0 0 250px; /* Ancho fijo de 250px para que no desperdicie espacio */
+        }
+
+        /* Columna de mensaje: ocupa todo el resto */
+        .col-mensaje {
+            flex: 1;
+        }
+
         label {
             font-weight: 600;
             display: block;
@@ -102,6 +119,11 @@
         textarea {
             resize: vertical;
             font-family: 'Courier New', monospace;
+        }
+
+        /* Forzar la misma altura visual inicial si deseas simetría */
+        #nums, #msg {
+            height: 160px;
         }
 
         .connection-box {
@@ -141,15 +163,8 @@
         }
 
         @keyframes pulse {
-
-            0%,
-            100% {
-                opacity: 1;
-            }
-
-            50% {
-                opacity: 0.5;
-            }
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
         }
 
         .status-text {
@@ -481,6 +496,16 @@
                 width: 100%;
                 position: static;
             }
+
+            /* Deshacer filas en pantallas pequeñas si es necesario */
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+            .col-numeros {
+                flex: none;
+                width: 100%;
+            }
         }
     </style>
 </head>
@@ -513,18 +538,20 @@
             </div>
 
             <form id="envioForm">
-                <div class="form-group">
-                    <label>Lista de Destinatarios</label>
-                    <textarea id="nums" rows="7" placeholder="51987654321&#10;51912345678&#10;51923456789"></textarea>
-                    <div class="input-hint">Un número por línea con código de país</div>
-                </div>
+                
+                <div class="form-row">
+                    <div class="form-group col-numeros">
+                        <label>Lista de Destinatarios</label>
+                        <textarea id="nums" placeholder="51987654321&#10;51912345678&#10;51923456789"></textarea>
+                        <div class="input-hint">Un número por línea con código de país</div>
+                    </div>
 
-                <div class="form-group">
-                    <label>Mensaje de Difusión</label>
-                    <textarea id="msg" rows="5" oninput="sync()" placeholder="Escriba aquí el mensaje..."></textarea>
-                    <div class="input-hint">Este texto se enviará a todos</div>
+                    <div class="form-group col-mensaje">
+                        <label>Mensaje de Difusión</label>
+                        <textarea id="msg" oninput="sync()" placeholder="Escriba aquí el mensaje..."></textarea>
+                        <div class="input-hint">Este texto se enviará a todos</div>
+                    </div>
                 </div>
-
                 <div class="form-group">
                     <label>Archivo Adjunto (Opcional)</label>
                     <div class="file-upload-wrapper">
