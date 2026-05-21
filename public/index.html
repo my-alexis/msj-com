@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Masivos IT - New Horizons</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', 'Segoe UI', sans-serif;
+            background: #f5f7fa;
+            min-height: 100vh;
+        }
+
+        .top-header {
+            background: linear-gradient(135deg, #0d47a1 0%, #1565c0 100%);
+            color: white;
+            padding: 20px 40px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .top-header h1 {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .top-header p {
+            font-size: 13px;
+            opacity: 0.9;
+            margin-top: 4px;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 30px;
+            display: flex;
+            gap: 30px;
+            align-items: flex-start;
+        }
+
+        #form-section {
+            flex: 1;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            padding: 40px;
+        }
+
+        .section-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1a237e;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid #1565c0;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            font-weight: 600;
+            display: block;
+            margin-bottom: 8px;
+            color: #37474f;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        textarea,
+        input[type="text"],
+        select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 14px;
+            transition: all 0.3s;
+            background: #fafafa;
+        }
+
+        textarea:focus,
+        input[type="text"]:focus,
+        select:focus {
+            outline: none;
+            border-color: #1565c0;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(21, 101, 192, 0.1);
+        }
+
+        textarea {
+            resize: vertical;
+            font-family: 'Courier New', monospace;
+        }
+
+        .connection-box {
+            background: #f5f9ff;
+            border: 2px solid #1565c0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        .connection-status {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.disconnected {
+            background: #d32f2f;
+            animation: none;
+        }
+
+        .status-dot.connecting {
+            background: #ff9800;
+        }
+
+        .status-dot.authenticated {
+            background: #4caf50;
+            animation: none;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        .status-text {
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .qr-container {
+            background: white;
+            border: 2px solid #1565c0;
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            display: none;
+            margin-top: 15px;
+        }
+
+        .qr-container.visible {
+            display: block;
+        }
+
+        .qr-container img {
+            max-width: 300px;
+            height: auto;
+        }
+
+        .qr-instruction {
+            font-size: 12px;
+            color: #546e7a;
+            margin-top: 10px;
+        }
+
+        .file-upload-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+
+        .file-upload-wrapper input[type="file"] {
+            position: absolute;
+            left: -9999px;
+        }
+
+        .file-upload-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 16px;
+            background: #fafafa;
+            border: 2px dashed #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 14px;
+            color: #546e7a;
+        }
+
+        .file-upload-label:hover {
+            border-color: #1565c0;
+            background: #f5f9ff;
+        }
+
+        .file-upload-label.has-file {
+            border-style: solid;
+            border-color: #1565c0;
+            background: #e3f2fd;
+            color: #0d47a1;
+        }
+
+        .file-icon {
+            font-size: 24px;
+        }
+
+        .file-remove {
+            margin-left: auto;
+            padding: 4px 12px;
+            background: #f44336;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .file-remove:hover {
+            background: #d32f2f;
+        }
+
+        .input-hint {
+            font-size: 12px;
+            color: #78909c;
+            margin-top: 6px;
+        }
+
+        button {
+            background: linear-gradient(135deg, #0d47a1 0%, #1565c0 100%);
+            color: white;
+            border: none;
+            padding: 18px;
+            width: 100%;
+            cursor: pointer;
+            font-weight: 600;
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 12px rgba(13, 71, 161, 0.3);
+            margin-top: 10px;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, #01579b 0%, #0d47a1 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(13, 71, 161, 0.4);
+        }
+
+        button:disabled {
+            background: #90a4ae;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        #preview-section {
+            width: 420px;
+            position: sticky;
+            top: 30px;
+        }
+
+        .preview-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+        }
+
+        .preview-header {
+            background: linear-gradient(135deg, #263238 0%, #37474f 100%);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .preview-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .phone-mockup {
+            background: #fafafa;
+            padding: 20px;
+            text-align: center;
+            min-height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .phone-screen {
+            width: 100%;
+            max-width: 300px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            border: 8px solid #263238;
+        }
+
+        .chat-header {
+            background: #075e54;
+            color: white;
+            padding: 12px;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        .bubble {
+            padding: 15px;
+            text-align: left;
+            background: #e3f2fd;
+            margin: 15px;
+            border-radius: 12px;
+            border-bottom-left-radius: 4px;
+            word-wrap: break-word;
+        }
+
+        .bubble-text {
+            font-size: 13px;
+            color: #263238;
+            line-height: 1.4;
+        }
+
+        .file-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .preview-file-icon {
+            font-size: 24px;
+        }
+
+        .file-info {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            text-align: left;
+        }
+
+        .file-info strong {
+            font-size: 12px;
+        }
+
+        .file-info span {
+            font-size: 11px;
+            color: #666;
+        }
+
+        .bubble-time {
+            font-size: 11px;
+            color: #90a4ae;
+            margin-top: 6px;
+            text-align: right;
+        }
+
+        #status-box {
+            display: none;
+            background: #f5f9ff;
+            border: 2px solid #1565c0;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+
+        .status-header {
+            font-weight: 600;
+            color: #1565c0;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #1565c0;
+            text-align: center;
+        }
+
+        .stat-val {
+            display: block;
+            font-size: 24px;
+            font-weight: 700;
+            color: #1565c0;
+            margin-bottom: 4px;
+        }
+
+        .stat-label {
+            font-size: 12px;
+            color: #546e7a;
+            text-transform: uppercase;
+        }
+
+        .progress-container {
+            margin-top: 15px;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e0e0e0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #0d47a1, #1565c0);
+            width: 0%;
+            transition: width 0.3s;
+        }
+
+        .pause-container {
+            background: #fff3cd;
+            border: 2px solid #ff9800;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            display: none;
+            text-align: center;
+        }
+
+        .pause-container.visible {
+            display: block;
+        }
+
+        .pause-text {
+            font-weight: 600;
+            color: #f57f17;
+            margin-bottom: 8px;
+        }
+
+        .pause-timer {
+            font-size: 28px;
+            font-weight: 700;
+            color: #ff9800;
+        }
+
+        @media (max-width: 1200px) {
+            .container {
+                flex-direction: column;
+            }
+
+            #preview-section {
+                width: 100%;
+                position: static;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="top-header">
+        <h1>NEW HORIZONS - Sistema de Mensajería Masiva</h1>
+        <p>Panel de Administración IT | Envío por Lotes</p>
+    </div>
+
+    <div class="container">
+        <div id="form-section">
+            <h2 class="section-title">Configuración de Envío</h2>
+
+            <div class="connection-box">
+                <label>Asesor Académico</label>
+                <div class="connection-status">
+                    <div class="status-dot disconnected" id="statusDot"></div>
+                    <span class="status-text" id="statusText">Desconectado</span>
+                </div>
+                <select id="asesorSelect" onchange="conectarWhatsApp()">
+                    <option value="">-- Seleccionar --</option>
+                    <option value="asesor1">Asesor 1</option>
+                </select>
+                <div class="qr-container" id="qrContainer">
+                    <div id="qrImage"></div>
+                    <div class="qr-instruction">Escanea el código QR con tu teléfono</div>
+                </div>
+            </div>
+
+            <form id="envioForm">
+                <div class="form-group">
+                    <label>Lista de Destinatarios</label>
+                    <textarea id="nums" rows="7" placeholder="51987654321&#10;51912345678&#10;51923456789"></textarea>
+                    <div class="input-hint">Un número por línea con código de país</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Mensaje de Difusión</label>
+                    <textarea id="msg" rows="5" oninput="sync()" placeholder="Escriba aquí el mensaje..."></textarea>
+                    <div class="input-hint">Este texto se enviará a todos</div>
+                </div>
+
+                <div class="form-group">
+                    <label>Archivo Adjunto (Opcional)</label>
+                    <div class="file-upload-wrapper">
+                        <input type="file" id="archivo" accept="image/*,audio/*,video/*,.pdf"
+                            onchange="handleFileSelect(event)">
+                        <label for="archivo" class="file-upload-label" id="fileLabel">
+                            <span class="file-icon">📎</span>
+                            <span id="fileLabelText">Seleccionar archivo</span>
+                        </label>
+                    </div>
+                    <div class="input-hint">Formatos: Imágenes, audios, videos, PDF (máx. 50MB)</div>
+                </div>
+
+                <button type="button" id="btnEnviar" onclick="enviar()">Iniciar Proceso de Envío</button>
+            </form>
+
+            <div id="status-box">
+                <div class="status-header">
+                    <span id="estado-label">Procesando envíos...</span>
+                </div>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <span class="stat-val" id="count-sent">0</span>
+                        <span class="stat-label">Enviados</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-val" id="count-total">0</span>
+                        <span class="stat-label">Total</span>
+                    </div>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                    <div style="font-size: 12px; color: #546e7a; margin-top: 8px; text-align: center;"
+                        id="progressText">0%</div>
+                </div>
+                <div class="pause-container" id="pauseContainer">
+                    <div class="pause-text">⏸️ Pausa entre lotes</div>
+                    <div class="pause-timer" id="pauseTimer">10:00</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="preview-section">
+            <div class="preview-card">
+                <div class="preview-header">
+                    <h3>Vista Previa</h3>
+                </div>
+
+                <div class="phone-mockup">
+                    <div class="phone-screen">
+                        <div class="chat-header">Destinatario</div>
+                        <div class="bubble">
+                            <div id="file-preview" class="file-box" style="display:none;">
+                                <div class="preview-file-icon" id="previewFileIcon">📎</div>
+                                <div class="file-info">
+                                    <strong id="file-name">Archivo</strong>
+                                    <span id="file-size"></span>
+                                </div>
+                            </div>
+                            <div id="txt-v" class="bubble-text">Escriba su mensaje...</div>
+                            <div class="bubble-time">Ahora</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFile = null;
+        let ws = null;
+        let currentAsesor = null;
+
+        // Conectar WebSocket
+        function conectarWS() {
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            ws = new WebSocket(protocol + '//' + window.location.host);
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+
+                if (data.type === 'qr') {
+                    mostrarQR(data.qr);
+                    actualizarEstado('connecting', 'Conectando...');
+                } else if (data.type === 'ready' || data.type === 'status' && data.status === 'authenticated') {
+                    ocultarQR();
+                    actualizarEstado('authenticated', 'Conectado');
+                } else if (data.type === 'disconnected') {
+                    actualizarEstado('disconnected', 'Desconectado');
+                } else if (data.type === 'progress') {
+                    document.getElementById('count-sent').innerText = data.enviados;
+                    document.getElementById('count-total').innerText = data.total;
+                    const porcentaje = data.porcentaje;
+                    document.getElementById('progressFill').style.width = porcentaje + '%';
+                    document.getElementById('progressText').innerText = porcentaje + '%';
+                } else if (data.type === 'pause') {
+                    const minutos = Math.floor(data.tiempoRestante / 60);
+                    const segundos = data.tiempoRestante % 60;
+                    document.getElementById('pauseTimer').innerText =
+                        minutos + ':' + (segundos < 10 ? '0' : '') + segundos;
+                }
+            };
+
+            ws.onopen = () => {
+                console.log('WebSocket conectado');
+            };
+
+            ws.onerror = () => {
+                setTimeout(conectarWS, 3000);
+            };
+        }
+
+        function actualizarEstado(estado, texto) {
+            const dot = document.getElementById('statusDot');
+            const text = document.getElementById('statusText');
+
+            dot.className = 'status-dot ' + estado;
+            text.innerText = texto;
+        }
+
+        function mostrarQR(qr) {
+            const container = document.getElementById('qrContainer');
+            const qrImage = document.getElementById('qrImage');
+            
+            // Limpiar contenedor anterior
+            qrImage.innerHTML = '';
+            
+            // Generar QR con la librería
+            new QRCode(qrImage, {
+                text: qr,
+                width: 250,
+                height: 250
+            });
+            
+            container.classList.add('visible');
+            document.getElementById('pauseContainer').classList.remove('visible');
+        }
+
+        function ocultarQR() {
+            document.getElementById('qrContainer').classList.remove('visible');
+        }
+
+        function conectarWhatsApp() {
+            const select = document.getElementById('asesorSelect');
+            const valor = select.value;
+
+            if (valor) {
+                currentAsesor = valor;
+                actualizarEstado('connecting', 'Conectando...');
+                ocultarQR();
+
+                // Simular conexión (el servidor enviará el estado real por WebSocket)
+                setTimeout(() => {
+                    fetch('/status').then(r => r.json()).then(data => {
+                        if (data.status === 'authenticated') {
+                            actualizarEstado('authenticated', 'Conectado');
+                        } else if (data.status === 'connecting') {
+                            actualizarEstado('connecting', 'Conectando...');
+                        }
+                    });
+                }, 1000);
+            }
+        }
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            const label = document.getElementById('fileLabel');
+            const labelText = document.getElementById('fileLabelText');
+
+            if (file) {
+                selectedFile = file;
+                label.classList.add('has-file');
+
+                let removeBtn = document.getElementById('removeFileBtn');
+                if (!removeBtn) {
+                    removeBtn = document.createElement('button');
+                    removeBtn.id = 'removeFileBtn';
+                    removeBtn.className = 'file-remove';
+                    removeBtn.textContent = 'Eliminar';
+                    removeBtn.type = 'button';
+                    removeBtn.onclick = removeFile;
+                    label.appendChild(removeBtn);
+                }
+
+                const fileSize = (file.size / (1024 * 1024)).toFixed(2);
+                labelText.innerHTML = `<strong>${file.name}</strong> (${fileSize} MB)`;
+
+                updateFilePreview(file);
+            }
+        }
+
+        function removeFile() {
+            selectedFile = null;
+            document.getElementById('archivo').value = '';
+            const label = document.getElementById('fileLabel');
+            const labelText = document.getElementById('fileLabelText');
+
+            label.classList.remove('has-file');
+            labelText.textContent = 'Seleccionar archivo';
+
+            const removeBtn = document.getElementById('removeFileBtn');
+            if (removeBtn) removeBtn.remove();
+
+            document.getElementById('file-preview').style.display = 'none';
+        }
+
+        function updateFilePreview(file) {
+            const fp = document.getElementById('file-preview');
+            const icon = document.getElementById('previewFileIcon');
+            const fileName = document.getElementById('file-name');
+            const fileSize = document.getElementById('file-size');
+
+            fp.style.display = 'flex';
+            fileName.textContent = file.name.substring(0, 25) + (file.name.length > 25 ? '...' : '');
+            fileSize.textContent = (file.size / (1024 * 1024)).toFixed(2) + ' MB';
+
+            if (file.type.startsWith('image/')) {
+                icon.textContent = '🖼️';
+            } else if (file.type.startsWith('audio/')) {
+                icon.textContent = '🎵';
+            } else if (file.type.startsWith('video/')) {
+                icon.textContent = '🎥';
+            } else if (file.type.includes('pdf')) {
+                icon.textContent = '📄';
+            }
+        }
+
+        function sync() {
+            const m = document.getElementById('msg').value;
+            document.getElementById('txt-v').innerText = m || "Escriba su mensaje...";
+        }
+
+        async function enviar() {
+            if (!currentAsesor) {
+                alert("⚠️ Selecciona un asesor primero");
+                return;
+            }
+
+            const btn = document.getElementById('btnEnviar');
+            const numsRaw = document.getElementById('nums').value.split('\n').filter(n => n.trim() !== "");
+
+            if (numsRaw.length === 0) {
+                alert("⚠️ Ingresa al menos un número");
+                return;
+            }
+
+            const mensaje = document.getElementById('msg').value;
+            if (!mensaje.trim()) {
+                alert("⚠️ Escribe un mensaje");
+                return;
+            }
+
+            if (!confirm(`¿Enviar a ${numsRaw.length} contactos?`)) return;
+
+            const formData = new FormData();
+            formData.append('numeros', JSON.stringify(numsRaw));
+            formData.append('mensaje', mensaje);
+            if (selectedFile) formData.append('archivo', selectedFile);
+
+            btn.disabled = true;
+            document.getElementById('status-box').style.display = 'block';
+            document.getElementById('pauseContainer').classList.remove('visible');
+            document.getElementById('estado-label').innerText = "Procesando...";
+
+            try {
+                const response = await fetch('/enviar-masivo', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                if (response.ok && result.success) {
+                    document.getElementById('estado-label').innerText = "✓ Completado";
+                    alert(`✓ Enviados: ${result.enviados}\n✗ Fallidos: ${result.fallidos}`);
+                } else {
+                    throw new Error(result.error);
+                }
+            } catch (err) {
+                alert("✗ Error: " + err.message);
+                document.getElementById('estado-label').innerText = "✗ Error";
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        // Iniciar conexión WebSocket
+        conectarWS();
+
+        // Verificar estado al cargar
+        fetch('/status').then(r => r.json()).then(data => {
+            if (data.status === 'authenticated') {
+                actualizarEstado('authenticated', 'Conectado');
+            }
+        });
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,10 @@
+# Dependencias de Node
+node_modules/
+
+# Autenticación y caché de WhatsApp (¡Súper importante por seguridad!)
+.wwebjs_auth/
+.wwebjs_cache/
+
+# Archivos del sistema o entornos locales (por si acaso los usas luego)
+.env
+.DS_Store
